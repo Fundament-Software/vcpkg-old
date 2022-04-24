@@ -81,8 +81,9 @@ file(REMOVE_RECURSE
     "${CURRENT_PACKAGES_DIR}/debug/share"
 )
 if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
-    # lesspipe.sh is the only file there
-    file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/bin" "${CURRENT_PACKAGES_DIR}/debug/bin")
+    # the DLL files must be present to properly load the cmake dependency, even if it's only linking the static versions
+    # file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/bin" "${CURRENT_PACKAGES_DIR}/debug/bin")
+    set(VCPKG_POLICY_DLLS_IN_STATIC_LIBRARY enabled)
 endif()
 
 file(INSTALL "${SOURCE_PATH}/LICENSE" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME copyright)

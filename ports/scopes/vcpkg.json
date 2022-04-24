@@ -1,0 +1,18 @@
+{
+  "name": "scopes",
+  "version": "0.18",
+  "port-version": 1,
+  "description": "Scopes Lang",
+  "homepage": "https://sr.ht/~duangle/scopes/",
+  "license": "MIT",
+  "dependencies": [
+    { 
+      "name": "llvm",
+      "features": ["clang","compiler-rt","enable-threads","tools","target-webassembly","target-x86","polly","disable-abi-breaking-checks"]
+    },
+    "spirv-cross",
+    "spirv-headers",
+    "spirv-tools",
+    "zlib"
+  ],
+}
