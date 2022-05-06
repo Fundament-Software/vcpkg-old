@@ -8,11 +8,23 @@
   "dependencies": [
     { 
       "name": "llvm",
-      "features": ["clang","compiler-rt","enable-threads","tools","target-webassembly","target-x86","polly","disable-abi-breaking-checks"]
+      "default-features": false,
+      "features": ["clang","compiler-rt","disable-abi-breaking-checks","enable-threads","enable-zlib","target-webassembly","target-x86","polly","tools"],
+      "version>=": "13.0.0"
+    },
+    {
+      "name": "vcpkg-cmake",
+      "host": true
     },
     "spirv-cross",
     "spirv-headers",
     "spirv-tools",
     "zlib"
   ],
+  "default-features": [],
+  "features": {
+    "enable-address-sanitizer": {
+      "description": "Enables clang's address-sanitizer when compiling scopes"
+    }
+  }
 }
