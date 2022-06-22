@@ -18,8 +18,6 @@
   ],
   "default-features": [
     "clang",
-    "default-options",
-    "default-targets",
     "lld",
     "tools"
   ],
@@ -240,6 +238,20 @@
     },
     "parallel-libs": {
       "description": "Include parallel-libs project."
+    },
+    "use-rpmalloc": {
+      "description": "Replace the default CRT allocator with rpmalloc"
+    },
+    "use-mimalloc": {
+      "description": "Replace the default CRT allocator with mimalloc",
+      "dependencies": [
+        {
+          "name": "mimalloc",
+          "features": [
+            "override"
+          ]
+        }
+      ]
     },
     "polly": {
       "description": "Include Polly (Polyhedral optimizations for LLVM) project.",

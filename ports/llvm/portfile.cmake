@@ -2,23 +2,6 @@ set(LLVM_VERSION "13.0.0")
 
 vcpkg_check_linkage(ONLY_STATIC_LIBRARY)
 
-vcpkg_from_github(
-    OUT_SOURCE_PATH SOURCE_PATH
-    REPO llvm/llvm-project
-    REF llvmorg-${LLVM_VERSION}
-    SHA512 8004c05d32b9720fb3391783621690c1df9bd1e97e72cbff9192ed88a84b0acd303b61432145fa917b5b5e548c8cee29b24ef8547dcc8677adf4816e7a8a0eb2
-    HEAD_REF master
-    PATCHES
-        0002-fix-install-paths.patch    # This patch fixes paths in ClangConfig.cmake, LLVMConfig.cmake, LLDConfig.cmake etc.
-        0003-fix-openmp-debug.patch
-        0004-fix-dr-1734.patch
-        0005-fix-tools-path.patch
-        0007-fix-compiler-rt-install-path.patch
-        0009-fix-tools-install-path.patch
-        0010-fix-libffi.patch
-        0011-fix-libxml2.patch
-)
-
 vcpkg_check_features(
     OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     FEATURES
@@ -34,6 +17,29 @@ vcpkg_check_features(
         enable-eh LLVM_ENABLE_EH
         enable-bindings LLVM_ENABLE_BINDINGS
 )
+
+if(VCPKG_TARGET_IS_WINDOWS)
+  list(APPEND LLVM_PATCHES "real_hack.patch")
+endif()
+
+vcpkg_from_github(
+    OUT_SOURCE_PATH SOURCE_PATH
+    REPO llvm/llvm-project
+    REF llvmorg-${LLVM_VERSION}
+    SHA512 8004c05d32b9720fb3391783621690c1df9bd1e97e72cbff9192ed88a84b0acd303b61432145fa917b5b5e548c8cee29b24ef8547dcc8677adf4816e7a8a0eb2
+    HEAD_REF master
+    PATCHES
+        0002-fix-install-paths.patch    # This patch fixes paths in ClangConfig.cmake, LLVMConfig.cmake, LLDConfig.cmake etc.
+        0003-fix-openmp-debug.patch
+        0004-fix-dr-1734.patch
+        0005-fix-tools-path.patch
+        0007-fix-compiler-rt-install-path.patch
+        0009-fix-tools-install-path.patch
+        0010-fix-libffi.patch
+        0011-fix-libxml2.patch
+        ${LLVM_PATCHES}
+)
+
 
 # LLVM generates CMake error due to Visual Studio version 16.4 is known to miscompile part of LLVM.
 # LLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON disables this error.
@@ -73,6 +79,37 @@ elseif("disable-assertions" IN_LIST FEATURES)
     list(APPEND FEATURE_OPTIONS
         -DLLVM_ENABLE_ASSERTIONS=OFF
     )
+endif()
+
+if("use-rpmalloc" IN_LIST FEATURES)    
+  if(NOT DEFINED VCPKG_BUILD_TYPE OR NOT VCPKG_BUILD_TYPE STREQUAL "debug")
+    vcpkg_from_github(
+      OUT_SOURCE_PATH RPMALLOC_SOURCE_PATH
+      REPO mjansson/rpmalloc
+      REF 1.4.4
+      SHA512 0a60ce5839014fe1c69f9261b51786b14cf9370dbfbff65bcd62ddd8cb995e479761d623fb3da742df8922167800788a5e722c73d3e3c0d19d0818928570e3be
+      HEAD_REF master
+    )
+    
+    file(REMOVE_RECURSE "${RPMALLOC_SOURCE_PATH}-rpmalloc")
+    file(RENAME ${RPMALLOC_SOURCE_PATH} "${RPMALLOC_SOURCE_PATH}-rpmalloc")
+    
+    list(APPEND RELEASE_FEATURE_OPTIONS
+      -DLLVM_INTEGRATED_CRT_ALLOC="${RPMALLOC_SOURCE_PATH}-rpmalloc"
+    )
+  endif()
+endif()
+
+if("use-mimalloc" IN_LIST FEATURES)    
+  if(NOT DEFINED VCPKG_BUILD_TYPE OR NOT VCPKG_BUILD_TYPE STREQUAL "debug")
+    list(APPEND RELEASE_FEATURE_OPTIONS
+      -DLLVM_INTEGRATED_CRT_ALLOC="${CURRENT_INSTALLED_DIR}/lib/mimalloc"
+    )
+    
+    file(REMOVE "${CURRENT_INSTALLED_DIR}/lib/mimalloc/out/msvc-x64/Release/mimalloc-static.lib")
+    file(MAKE_DIRECTORY "${CURRENT_INSTALLED_DIR}/lib/mimalloc/out/msvc-x64/Release")
+    file(COPY "${CURRENT_INSTALLED_DIR}/lib/mimalloc-static.lib" DESTINATION "${CURRENT_INSTALLED_DIR}/lib/mimalloc/out/msvc-x64/Release")
+  endif()
 endif()
 
 # LLVM_ABI_BREAKING_CHECKS can be WITH_ASSERTS (default), FORCE_ON or FORCE_OFF.
@@ -258,8 +295,11 @@ vcpkg_cmake_configure(
         -DLLVM_BUILD_LLVM_C_DYLIB=OFF
         # Path for binary subdirectory (defaults to 'bin')
         -DLLVM_TOOLS_INSTALL_DIR=tools/llvm
+        -DCMAKE_CXX_STANDARD=17
     OPTIONS_DEBUG
         -DCMAKE_DEBUG_POSTFIX=d
+    OPTIONS_RELEASE
+        ${RELEASE_FEATURE_OPTIONS}
 )
 
 vcpkg_cmake_install(ADD_BIN_TO_PATH)

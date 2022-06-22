@@ -9,7 +9,7 @@
     { 
       "name": "llvm",
       "default-features": false,
-      "features": ["clang","compiler-rt","disable-abi-breaking-checks","enable-threads","enable-zlib","target-webassembly","target-x86","polly","tools"],
+      "features": ["clang","enable-zlib","target-webassembly","target-x86","target-aarch64","target-riscv","polly","use-mimalloc", "disable-assertions", "disable-clang-static-analyzer", "enable-bindings", "enable-terminfo"],
       "version>=": "13.0.0"
     },
     {
@@ -21,10 +21,19 @@
     "spirv-tools",
     "zlib"
   ],
-  "default-features": [],
+  "default-features": ["target-webassembly"],
   "features": {
     "enable-address-sanitizer": {
       "description": "Enables clang's address-sanitizer when compiling scopes"
+    },
+    "target-webassembly": {
+      "description": "Enables the WebAssembly architecture target"
+    },
+    "target-aarch64": {
+      "description": "Enables the AArch64 architecture target"
+    },
+    "target-riscv": {
+      "description": "Enables the RISC-V architecture target"
     }
   }
 }
