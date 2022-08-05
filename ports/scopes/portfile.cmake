@@ -1,4 +1,3 @@
-#message(STATUS "target: ${TARGET_TRIPLET} host: ${HOST_TRIPLET}")
 
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
