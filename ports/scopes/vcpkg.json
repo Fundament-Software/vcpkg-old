@@ -19,7 +19,8 @@
     "spirv-cross",
     "spirv-headers",
     "spirv-tools",
-    "zlib"
+    "zlib",
+    "abseil"
   ],
   "default-features": ["target-webassembly"],
   "features": {
