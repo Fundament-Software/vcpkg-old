@@ -49,6 +49,13 @@ list(APPEND FEATURE_OPTIONS
     -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON
 )
 
+if(VCPKG_CRT_LINKAGE STREQUAL "static")
+    list(APPEND FEATURE_OPTIONS
+        -DLLVM_USE_CRT_DEBUG=MTd
+        -DLLVM_USE_CRT_RELEASE=MT
+    )
+endif()
+
 # Force enable or disable external libraries
 set(llvm_external_libraries
     zlib

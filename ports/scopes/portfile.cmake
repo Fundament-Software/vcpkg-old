@@ -14,6 +14,7 @@ vcpkg_check_features(
         target-webassembly TARGET_WEBASSEMBLY
         target-aarch64 TARGET_AARCH64
         target-riscv TARGET_RISCV
+        use-mimalloc USE_MIMALLOC
 )
 
 vcpkg_cmake_configure(

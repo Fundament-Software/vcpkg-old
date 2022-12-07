@@ -9,7 +9,7 @@
     { 
       "name": "llvm",
       "default-features": false,
-      "features": ["clang","enable-zlib","target-webassembly","target-x86","target-aarch64","target-riscv","polly","use-mimalloc", "disable-assertions", "disable-clang-static-analyzer", "enable-bindings", "enable-terminfo"],
+      "features": ["clang","enable-zlib","target-webassembly","target-x86","target-aarch64","target-riscv","polly", "disable-assertions", "disable-clang-static-analyzer", "enable-bindings", "enable-terminfo"],
       "version>=": "13.0.0"
     },
     {
@@ -35,6 +35,23 @@
     },
     "target-riscv": {
       "description": "Enables the RISC-V architecture target"
+    },
+    "use-mimalloc": {
+      "description": "Replace the default CRT allocator with mimalloc",
+      
+      "dependencies": [
+        {
+          "name": "mimalloc",
+          "features": [
+            "override"
+          ]
+        },
+        {
+          "name": "llvm",
+          "default-features": false,
+          "features": ["clang","enable-zlib","target-webassembly","target-x86","target-aarch64","target-riscv","polly","use-mimalloc", "disable-assertions", "disable-clang-static-analyzer", "enable-bindings", "enable-terminfo"]
+        }
+      ]
     }
   }
 }
